@@ -44,8 +44,9 @@
 
         .exit-link {
             display: inline-block; padding: 12px 20px; background: #ef4444; color: white;
-            text-decoration: none; font-weight: bold; font-size: 15px; border-radius: 6px;
+            border: none; font-weight: bold; font-size: 15px; border-radius: 6px;
             transition: all 0.2s; box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
+            cursor: pointer;
         }
         .exit-link:hover { background: #b91c1c; transform: translateY(-1px); }
 
@@ -107,8 +108,8 @@
             </div>
             
             <div class="control-group">
-                <!-- target="_top" sayesinde yeni sekme açmaz, mevcut sekmenin tamamını ana sayfaya yönlendirir -->
-                <a href="https://www.montopan.com/ana-sayfa" target="_top" class="exit-link">🚪 Geri Dön</a>
+                <!-- Sinyal gönderen buton -->
+                <button type="button" class="exit-link" onclick="exitToHome()">🚪 Geri Dön</button>
             </div>
         </div>
 
@@ -120,6 +121,11 @@
     </div>
 
 <script>
+function exitToHome() {
+    // Ana sayfaya (Google Sites) yönlendirme mesajı gönderir
+    window.parent.postMessage('go_home', '*');
+}
+
 document.getElementById("panelInput").addEventListener("change", function(e) {
     if (!e.target.files || e.target.files.length === 0) return;
     
