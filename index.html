@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Montopan Cephe Visualizer v12.2</title>
-    <!-- Ekrandaki görüntüyü birebir indirmek için gerekli kütüphane -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -31,28 +29,22 @@
             z-index: 20;
             flex-wrap: wrap; gap: 10px;
         }
-        .control-group { display: flex; align-items: center; gap: 12px; position: relative; z-index: 30; }
+        .control-group { display: flex; align-items: center; gap: 15px; position: relative; z-index: 30; }
         input[type="file"] { display: none; }
         
         .custom-file-upload {
-            display: inline-block; padding: 12px 20px; cursor: pointer;
+            display: inline-block; padding: 12px 24px; cursor: pointer;
             background: #334155; color: #fff; border: 2px dashed #38bdf8;
-            border-radius: 6px; font-weight: 600; font-size: 14px; transition: all 0.2s;
+            border-radius: 6px; font-weight: 600; font-size: 15px; transition: all 0.2s;
+            position: relative;
+            z-index: 40;
         }
         .custom-file-upload:hover { background: #38bdf8; color: #0f172a; border-style: solid; }
-        #file-status { font-size: 13px; color: #94a3b8; max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        .download-btn {
-            display: inline-block; padding: 12px 20px; background: #10b981; color: white;
-            border: none; font-weight: bold; font-size: 14px; border-radius: 6px;
-            transition: all 0.2s; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
-            cursor: pointer;
-        }
-        .download-btn:hover { background: #059669; transform: translateY(-1px); }
+        #file-status { font-size: 13px; color: #94a3b8; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .exit-link {
             display: inline-block; padding: 12px 20px; background: #ef4444; color: white;
-            border: none; font-weight: bold; font-size: 14px; border-radius: 6px;
+            border: none; font-weight: bold; font-size: 15px; border-radius: 6px;
             transition: all 0.2s; box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
             cursor: pointer;
         }
@@ -110,13 +102,13 @@
     <div id="app-wrapper">
         <div id="top-control-bar">
             <div class="control-group">
-                <label for="panelInput" class="custom-file-upload">📁 Panel Seç</label>
+                <label for="panelInput" class="custom-file-upload">📁 Panel Seç (Resim Çağır)</label>
                 <input type="file" id="panelInput" accept="image/*">
                 <span id="file-status">Panel Seçilmedi</span>
             </div>
             
             <div class="control-group">
-                <button type="button" class="download-btn" onclick="downloadDesign()">💾 Tasarımı İndir</button>
+                <!-- Sekmeyi kapatan / Ana sayfaya yönlendiren buton -->
                 <button type="button" class="exit-link" onclick="closeOrRedirect()">🚪 Geri Dön</button>
             </div>
         </div>
@@ -130,7 +122,10 @@
 
 <script>
 function closeOrRedirect() {
+    // 1. Yeni sekmede açıldığı için öncelikle o anki sekmeyi kapatmayı dener
     window.close();
+    
+    // 2. Eğer tarayıcı sekmeyi kapatmayı engellerse aynı sekmede ana sayfaya yönlendirir
     setTimeout(function() {
         window.location.href = "https://www.montopan.com/ana-sayfa";
     }, 100);
@@ -151,27 +146,6 @@ document.getElementById("panelInput").addEventListener("change", function(e) {
     }
     reader.readAsDataURL(file);
 });
-
-// BİREBİR EKRAN GÖRÜNTÜSÜ ALARAK İNDİRME FONKSİYONU
-function downloadDesign() {
-    const stage = document.getElementById("stage-wrapper");
-
-    // Ekranda görünen alanın birebir fotoğrafını çeker
-    html2canvas(stage, {
-        useCORS: true,
-        allowTaint: true,
-        scale: 2 // Yüksek çözünürlüklü indirmesi için ölçek
-    }).then(function(canvas) {
-        const link = document.createElement("a");
-        link.download = "montopan-tasarim.png";
-        link.href = canvas.toDataURL("image/png");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }).catch(function(err) {
-        alert("Resim oluşturulurken bir hata oluştu: " + err);
-    });
-}
 </script>
 </body>
 </html>
