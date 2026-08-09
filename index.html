@@ -108,8 +108,8 @@
             </div>
             
             <div class="control-group">
-                <!-- Sinyal gönderen buton -->
-                <button type="button" class="exit-link" onclick="exitToHome()">🚪 Geri Dön</button>
+                <!-- Sekmeyi kapatan / Ana sayfaya yönlendiren buton -->
+                <button type="button" class="exit-link" onclick="closeOrRedirect()">🚪 Geri Dön</button>
             </div>
         </div>
 
@@ -121,9 +121,14 @@
     </div>
 
 <script>
-function exitToHome() {
-    // Ana sayfaya (Google Sites) yönlendirme mesajı gönderir
-    window.parent.postMessage('go_home', '*');
+function closeOrRedirect() {
+    // 1. Yeni sekmede açıldığı için öncelikle o anki sekmeyi kapatmayı dener
+    window.close();
+    
+    // 2. Eğer tarayıcı sekmeyi kapatmayı engellerse aynı sekmede ana sayfaya yönlendirir
+    setTimeout(function() {
+        window.location.href = "https://www.montopan.com/ana-sayfa";
+    }, 100);
 }
 
 document.getElementById("panelInput").addEventListener("change", function(e) {
