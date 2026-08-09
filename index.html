@@ -1,203 +1,86 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Montopan Cephe Visualizer v12.2</title>
-    <style>
-        * { box-sizing: border-box; }
-        body {
-            margin: 0; padding: 10px;
-            background-color: #0f172a;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            color: #f1f5f9;
-            display: flex; justify-content: center; align-items: center;
-            min-height: 100vh;
-        }
-        #app-wrapper {
-            width: 100%;
-            max-width: 1200px; background: #1e293b; padding: 20px;
-            border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            position: relative;
-            z-index: 10;
-        }
-        #top-control-bar {
-            display: flex; justify-content: space-between; align-items: center;
-            background: #0f172a; padding: 15px 25px;
-            border-radius: 10px; margin-bottom: 20px; border: 1px solid #334155;
-            position: relative;
-            z-index: 20;
-            flex-wrap: wrap; gap: 10px;
-        }
-        .control-group { display: flex; align-items: center; gap: 12px; position: relative; z-index: 30; }
-        input[type="file"] { display: none; }
-        
-        .custom-file-upload {
-            display: inline-block; padding: 12px 20px; cursor: pointer;
-            background: #334155; color: #fff; border: 2px dashed #38bdf8;
-            border-radius: 6px; font-weight: 600; font-size: 14px; transition: all 0.2s;
-        }
-        .custom-file-upload:hover { background: #38bdf8; color: #0f172a; border-style: solid; }
-        #file-status { font-size: 13px; color: #94a3b8; max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        .download-btn {
-            display: inline-block; padding: 12px 20px; background: #10b981; color: white;
-            border: none; font-weight: bold; font-size: 14px; border-radius: 6px;
-            transition: all 0.2s; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
-            cursor: pointer;
-        }
-        .download-btn:hover { background: #059669; transform: translateY(-1px); }
-
-        .exit-link {
-            display: inline-block; padding: 12px 20px; background: #ef4444; color: white;
-            border: none; font-weight: bold; font-size: 14px; border-radius: 6px;
-            transition: all 0.2s; box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
-            cursor: pointer;
-        }
-        .exit-link:hover { background: #b91c1c; transform: translateY(-1px); }
-
-        /* CANLI SAHNE ALANI */
-        #stage-wrapper {
-            position: relative;
-            width: 100%;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid #334155;
-            background: #0f172a;
-        }
-        #base-house {
-            display: block;
-            width: 100%;
-            height: auto;
-            z-index: 1;
-        }
-
-        /* KAPLAMA MASKELERI */
-        .wall-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 2; pointer-events: none;
-            mix-blend-mode: multiply;
-            opacity: 0.95;
-            background-repeat: repeat;
-            background-size: 180px auto;
-        }
-
-        /* 1. KATMAN: SOL ANA DUVAR */
-        .wall-left-main {
-            clip-path: polygon(
-                10.0% 34.6%, 50.8% 34.6%, 50.8% 65.4%, 10.0% 65.4%, 10.0% 34.6%,
-                18.1% 39.5%, 18.1% 56.4%, 26.6% 56.4%, 26.6% 39.5%, 18.1% 39.5%,
-                10.0% 34.6%,
-                34.7% 39.5%, 34.7% 56.4%, 43.1% 56.4%, 43.1% 39.5%, 34.7% 39.5%,
-                10.0% 34.6%
-            );
-        }
-
-        /* 2. KATMAN: SAG ARKA VERANDA DUVARI */
-        .wall-veranda-back {
-            clip-path: polygon(
-                64.2% 38.0%, 91.6% 38.0%, 91.6% 63.6%, 64.2% 63.6%, 64.2% 38.0%,
-                68.4% 41.5%, 68.4% 62.4%, 80.3% 62.4%, 80.3% 41.5%, 68.4% 41.5%
-            );
-        }
-    </style>
-</head>
-<body>
-
-    <div id="app-wrapper">
-        <div id="top-control-bar">
-            <div class="control-group">
-                <label for="panelInput" class="custom-file-upload">📁 Panel Seç</label>
-                <input type="file" id="panelInput" accept="image/*">
-                <span id="file-status">Panel Seçilmedi</span>
-            </div>
-            
-            <div class="control-group">
-                <button type="button" class="download-btn" onclick="downloadDesign()">💾 Tasarımı İndir</button>
-                <button type="button" class="exit-link" onclick="closeOrRedirect()">🚪 Geri Dön</button>
-            </div>
-        </div>
-
-        <div id="stage-wrapper">
-            <img src="house.jpg" id="base-house" alt="Demo Ev">
-            <div class="wall-overlay wall-left-main"></div>
-            <div class="wall-overlay wall-veranda-back"></div>
-        </div>
-    </div>
-
-<script>
-let activePanelDataUrl = null;
-
-function closeOrRedirect() {
-    window.close();
-    setTimeout(function() {
-        window.location.href = "https://www.montopan.com/ana-sayfa";
-    }, 100);
-}
-
-document.getElementById("panelInput").addEventListener("change", function(e) {
-    if (!e.target.files || e.target.files.length === 0) return;
-    
-    const file = e.target.files[0];
-    document.getElementById("file-status").innerText = file.name;
-
-    const reader = new FileReader();
-    reader.onload = function(evt) {
-        activePanelDataUrl = evt.target.result;
-        const wallOverlays = document.querySelectorAll(".wall-overlay");
-        wallOverlays.forEach(function(wall) {
-            wall.style.backgroundImage = "url('" + activePanelDataUrl + "')";
-        });
-    }
-    reader.readAsDataURL(file);
-});
-
+// TASARIMI BİREBİR EKRANDAKİ ÖLÇEKLE İNDİRME FONKSİYONU
 function downloadDesign() {
     const baseImg = document.getElementById("base-house");
 
     if (!baseImg.complete || baseImg.naturalWidth === 0) {
-        alert("Demo ev resmi yüklenemedi! Lütfen 'house.jpg' dosyasının index.html ile aynı klasörde olduğundan emin olun.");
+        alert("Demo ev resmi yüklenemedi!");
         return;
     }
 
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
+    // Canvas boyutlarını orijinal resim kalitesine eşitle
     canvas.width = baseImg.naturalWidth;
     canvas.height = baseImg.naturalHeight;
 
-    // 1. Ev Resmini Çiz
+    // 1. Arka plandaki evi çiz
     ctx.drawImage(baseImg, 0, 0, canvas.width, canvas.height);
 
-    // 2. Seçilen Panel Varsa Çiz
+    // 2. Seçilen desen varsa ekrandaki ölçek oranına göre çiz
     if (activePanelDataUrl) {
         const patternImg = new Image();
         patternImg.onload = function() {
             ctx.globalCompositeOperation = "multiply";
             ctx.globalAlpha = 0.95;
 
-            const pattern = ctx.createPattern(patternImg, "repeat");
+            // Ekrandaki 180px ölçeğini orijinal resim çözünürlüğüne oranlıyoruz
+            const displayWidth = baseImg.clientWidth || 1200;
+            const scaleFactor = canvas.width / displayWidth;
+            const targetPatternWidth = 180 * scaleFactor; // Ekrandaki 180px karşılığı
+            
+            // Deseni ekrandaki boyuta ölçeklendirmek için geçici Canvas
+            const patternCanvas = document.createElement("canvas");
+            const patternCtx = patternCanvas.getContext("2d");
+            const aspect = patternImg.height / patternImg.width;
+            
+            patternCanvas.width = targetPatternWidth;
+            patternCanvas.height = targetPatternWidth * aspect;
+            
+            patternCtx.drawImage(patternImg, 0, 0, patternCanvas.width, patternCanvas.height);
+
+            const pattern = ctx.createPattern(patternCanvas, "repeat");
             ctx.fillStyle = pattern;
 
             const scaleX = canvas.width / 100;
             const scaleY = canvas.height / 100;
 
-            // Sol Duvar
+            // SOL DUVAR (Pencereler Kırpılmış Detaylı Poligon)
             ctx.beginPath();
+            // Dış sınır
             ctx.moveTo(10.0 * scaleX, 34.6 * scaleY);
             ctx.lineTo(50.8 * scaleX, 34.6 * scaleY);
             ctx.lineTo(50.8 * scaleX, 65.4 * scaleY);
             ctx.lineTo(10.0 * scaleX, 65.4 * scaleY);
+            ctx.lineTo(10.0 * scaleX, 34.6 * scaleY);
+            // Sol pencere deliği
+            ctx.lineTo(18.1 * scaleX, 39.5 * scaleY);
+            ctx.lineTo(18.1 * scaleX, 56.4 * scaleY);
+            ctx.lineTo(26.6 * scaleX, 56.4 * scaleY);
+            ctx.lineTo(26.6 * scaleX, 39.5 * scaleY);
+            ctx.lineTo(18.1 * scaleX, 39.5 * scaleY);
+            ctx.lineTo(10.0 * scaleX, 34.6 * scaleY);
+            // Sağ pencere deliği
+            ctx.lineTo(34.7 * scaleX, 39.5 * scaleY);
+            ctx.lineTo(34.7 * scaleX, 56.4 * scaleY);
+            ctx.lineTo(43.1 * scaleX, 56.4 * scaleY);
+            ctx.lineTo(43.1 * scaleX, 39.5 * scaleY);
+            ctx.lineTo(34.7 * scaleX, 39.5 * scaleY);
             ctx.closePath();
             ctx.fill();
 
-            // Sağ Veranda
+            // SAĞ VERANDA DUVARI (Kapı Kırpılmış)
             ctx.beginPath();
             ctx.moveTo(64.2 * scaleX, 38.0 * scaleY);
             ctx.lineTo(91.6 * scaleX, 38.0 * scaleY);
             ctx.lineTo(91.6 * scaleX, 63.6 * scaleY);
             ctx.lineTo(64.2 * scaleX, 63.6 * scaleY);
+            ctx.lineTo(64.2 * scaleX, 38.0 * scaleY);
+            // Veranda kapı deliği
+            ctx.lineTo(68.4 * scaleX, 41.5 * scaleY);
+            ctx.lineTo(68.4 * scaleX, 62.4 * scaleY);
+            ctx.lineTo(80.3 * scaleX, 62.4 * scaleY);
+            ctx.lineTo(80.3 * scaleX, 41.5 * scaleY);
             ctx.closePath();
             ctx.fill();
 
@@ -208,20 +91,3 @@ function downloadDesign() {
         triggerDownload(canvas);
     }
 }
-
-function triggerDownload(canvas) {
-    try {
-        const dataURL = canvas.toDataURL("image/png");
-        const link = document.createElement("a");
-        link.download = "montopan-tasarim.png";
-        link.href = dataURL;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    } catch (err) {
-        alert("Yerel tarayıcı güvenlik engeli (file://). Kod web sunucusuna (GitHub) yüklendiğinde sorunsuz çalışacaktır. Yine de yerel test için VS Code 'Live Server' eklentisi kullanabilirsiniz.");
-    }
-}
-</script>
-</body>
-</html>
