@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Montopan Cephe Visualizer v12.2</title>
+    <!-- Ekrandaki görüntüyü birebir indirmek için gerekli kütüphane -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -153,67 +155,22 @@ document.getElementById("panelInput").addEventListener("change", function(e) {
 // BİREBİR EKRAN GÖRÜNTÜSÜ ALARAK İNDİRME FONKSİYONU
 function downloadDesign() {
     const stage = document.getElementById("stage-wrapper");
-    const baseImg = document.getElementById("base-house");
 
-    if (!baseImg.complete || baseImg.naturalWidth === 0) {
-        alert("Demo ev resmi yüklenemedi!");
-        return;
-    }
-
-    // Ekrandaki HTML ve CSS yapısını doğrudan SVG vektörüne gömüyoruz
-    const width = stage.clientWidth;
-    const height = stage.clientHeight;
-
-    const cloneStage = stage.cloneNode(true);
-    
-    // Görsel Yollarını Kesinleştirmek İçin DataURL Dönüşümü
-    const cloneImg = cloneStage.querySelector("img");
-    const canvasTemp = document.createElement("canvas");
-    canvasTemp.width = baseImg.naturalWidth;
-    canvasTemp.height = baseImg.naturalHeight;
-    const ctxTemp = canvasTemp.getContext("2d");
-    ctxTemp.drawImage(baseImg, 0, 0);
-    cloneImg.src = canvasTemp.toDataURL("image/jpeg");
-
-    const htmlString = new XMLSerializer().serializeToString(cloneStage);
-
-    const svgData = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
-        <foreignObject width="100%" height="100%">
-            <div xmlns="http://www.w3.org/1999/xhtml">
-                <style>
-                    #stage-wrapper { position: relative; width: ${width}px; height: ${height}px; overflow: hidden; }
-                    #base-house { width: 100%; height: 100%; display: block; }
-                    .wall-overlay { position: absolute; top:0; left:0; width:100%; height:100%; mix-blend-mode: multiply; opacity: 0.95; background-repeat: repeat; background-size: 180px auto; }
-                    .wall-left-main { clip-path: polygon(10.0% 34.6%, 50.8% 34.6%, 50.8% 65.4%, 10.0% 65.4%, 10.0% 34.6%, 18.1% 39.5%, 18.1% 56.4%, 26.6% 56.4%, 26.6% 39.5%, 18.1% 39.5%, 10.0% 34.6%, 34.7% 39.5%, 34.7% 56.4%, 43.1% 56.4%, 43.1% 39.5%, 34.7% 39.5%, 10.0% 34.6%); }
-                    .wall-veranda-back { clip-path: polygon(64.2% 38.0%, 91.6% 38.0%, 91.6% 63.6%, 64.2% 63.6%, 64.2% 38.0%, 68.4% 41.5%, 68.4% 62.4%, 80.3% 62.4%, 80.3% 41.5%, 68.4% 41.5%); }
-                </style>
-                ${htmlString}
-            </div>
-        </foreignObject>
-    </svg>`;
-
-    const img = new Image();
-    const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
-    const url = URL.createObjectURL(svgBlob);
-
-    img.onload = function() {
-        const finalCanvas = document.createElement("canvas");
-        finalCanvas.width = baseImg.naturalWidth;
-        finalCanvas.height = baseImg.naturalHeight;
-        const finalCtx = finalCanvas.getContext("2d");
-
-        // Yüksek çözünürlükte tuvale aktar
-        finalCtx.drawImage(img, 0, 0, finalCanvas.width, finalCanvas.height);
-        URL.revokeObjectURL(url);
-
-        const a = document.createElement("a");
-        a.download = "montopan-tasarim.png";
-        a.href = finalCanvas.toDataURL("image/png");
-        a.click();
-    };
-
-    img.src = url;
+    // Ekranda görünen alanın birebir fotoğrafını çeker
+    html2canvas(stage, {
+        useCORS: true,
+        allowTaint: true,
+        scale: 2 // Yüksek çözünürlüklü indirmesi için ölçek
+    }).then(function(canvas) {
+        const link = document.createElement("a");
+        link.download = "montopan-tasarim.png";
+        link.href = canvas.toDataURL("image/png");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }).catch(function(err) {
+        alert("Resim oluşturulurken bir hata oluştu: " + err);
+    });
 }
 </script>
 </body>
