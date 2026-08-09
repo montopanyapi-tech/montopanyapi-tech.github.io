@@ -42,13 +42,10 @@
         .custom-file-upload:hover { background: #38bdf8; color: #0f172a; border-style: solid; }
         #file-status { font-size: 13px; color: #94a3b8; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* GERİ DÖN BUTONU */
         .exit-link {
             display: inline-block; padding: 12px 20px; background: #ef4444; color: white;
             text-decoration: none; font-weight: bold; font-size: 15px; border-radius: 6px;
             transition: all 0.2s; box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
-            cursor: pointer;
-            border: none;
         }
         .exit-link:hover { background: #b91c1c; transform: translateY(-1px); }
 
@@ -110,8 +107,8 @@
             </div>
             
             <div class="control-group">
-                <!-- Güvenlik engelini kıran yönlendirme butonu -->
-                <button type="button" class="exit-link" onclick="safeRedirect()">🚪 Geri Dön</button>
+                <!-- target="_top" sayesinde yeni sekme açmaz, mevcut sekmenin tamamını ana sayfaya yönlendirir -->
+                <a href="https://www.montopan.com/ana-sayfa" target="_top" class="exit-link">🚪 Geri Dön</a>
             </div>
         </div>
 
@@ -123,24 +120,6 @@
     </div>
 
 <script>
-function safeRedirect() {
-    const destination = "https://www.montopan.com/ana-sayfa";
-    
-    // Çift katmanlı iframe engelini aşmak için tarayıcının en üst pencerelerine erişim denemesi
-    try {
-        if (window.top) {
-            window.top.location.href = destination;
-        } else if (window.parent) {
-            window.parent.location.href = destination;
-        } else {
-            window.location.href = destination;
-        }
-    } catch(err) {
-        // Tarayıcı güvenlik bloğu koyarsa doğrudan aynı pencere üzerinde zorla aç
-        window.open(destination, "_self");
-    }
-}
-
 document.getElementById("panelInput").addEventListener("change", function(e) {
     if (!e.target.files || e.target.files.length === 0) return;
     
