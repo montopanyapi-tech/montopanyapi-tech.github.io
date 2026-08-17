@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Montopan Cephe Visualizer v12.3</title>
+    <title>Montopan Müstakil Ev Simülatörü</title>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -20,7 +20,7 @@
             border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.5);
         }
         
-        /* 2 SÜTUNLU YERLEŞİM: SOL KONTROL, SAĞ EV SAHNESİ */
+        /* 2 SÜTUNLU YERLEŞİM */
         #visualizer-workspace {
             display: grid;
             grid-template-columns: 240px minmax(0, 1fr);
@@ -36,6 +36,22 @@
             padding: 10px;
             border-radius: 8px;
             border: 1px solid #334155;
+        }
+
+        /* UYGULAMA BAŞLIĞI STİLİ */
+        .app-title-box {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 8px;
+            text-align: center;
+        }
+        .app-title-box h2 {
+            margin: 0;
+            font-size: 13px;
+            color: #38bdf8;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
 
         .control-group {
@@ -137,7 +153,12 @@
         <div id="visualizer-workspace">
             <!-- SOL TARAF: KONTROL PANELİ -->
             <div id="left-controls">
-                <div class="control-group">
+                <!-- UYGULAMA BAŞLIĞI -->
+                <div class="app-title-box">
+                    <h2>Montopan Müstakil Ev Simülatörü</h2>
+                </div>
+
+                <div class="control-group" style="margin-top: 4px;">
                     <label for="panelInput" class="custom-file-upload">📁 Panel Seç</label>
                     <input type="file" id="panelInput" accept="image/*">
                     <span id="file-status">Seçilmedi</span>
