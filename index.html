@@ -198,12 +198,9 @@
         </div>
     </div>
 
-<script>
 function closeOrRedirect() {
-    window.close();
-    setTimeout(function() {
-        window.location.href = "https://www.montopan.com/ana-sayfa";
-    }, 100);
+    // Sekmeyi kapatmaya çalışmak yerine doğrudan ana sayfaya yönlendiriyoruz
+    window.location.href = "https://www.montopan.com/ana-sayfa";
 }
 
 document.getElementById("panelInput").addEventListener("change", function(e) {
